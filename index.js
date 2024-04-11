@@ -97,6 +97,9 @@ export const goToPage = (newPage, data) => {
           posts = newPosts;
           renderApp();
         })
+        .catch((error) => {
+          console.error(error);
+        });
     }
     else {
       page = newPage;
