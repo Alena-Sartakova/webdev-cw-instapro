@@ -88,9 +88,9 @@ export const goToPage = (newPage, data) => {
     else if (newPage === USER_POSTS_PAGE) {
       // TODO: реализовать получение постов юзера из API
       console.log("Открываю страницу пользователя: ", data.userId);
-      page = USER_POSTS_PAGE;
-       posts = [];
+      page = LOADING_PAGE;
       renderApp();
+
       return fetchPostsUser(data.userId, { token: getToken() })
         .then((newPosts) => {
           page = USER_POSTS_PAGE;
@@ -101,13 +101,12 @@ export const goToPage = (newPage, data) => {
     else {
       page = newPage;
       renderApp();
-
       return;
     }
 
   }
 
-  throw new Error("страницы не существует");
+  throw new Error("Cтраницы не существует");
 };
 
 const renderApp = () => {
