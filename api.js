@@ -69,7 +69,7 @@ export function uploadImage({ file }) {
   });
 }
 //посты пользователя
-export function fetchPostsUser( id , { token }) {
+export function fetchPostsUser(id, { token }) {
   return fetch(`${postsHost}/user-posts/${id}`, {
     method: "GET",
     headers: {
@@ -96,7 +96,7 @@ export const userPosts = ({ token, description, imageUrl }) => {
     }),
     headers: {
       Authorization: token,
-  }
+    }
   })
     .then((response) => {
       if (response.status === 500) {
@@ -109,3 +109,42 @@ export const userPosts = ({ token, description, imageUrl }) => {
     })
 
 }
+
+//лайки
+export const getLike = (id, { token }) => {
+  return fetch(`${postsHost}/${id}/like`, {
+    method: "POST",
+    headers: {
+      Authorization: token,
+    }
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Ошибка ${response.status}: ${response.statusText}`);
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      console.error("Ошибка при установке лайка:", error);
+      throw error;
+    });
+};
+
+export const getDislike = (id, { token }) => {
+  return fetch(`${postsHost}/${id}/dislike`, {
+    method: "POST",
+    headers: {
+      Authorization: token,
+    }
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Ошибка ${response.status}: ${response.statusText}`);
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      console.error("Ошибка при удалении лайка:", error);
+      throw error;
+    });
+};

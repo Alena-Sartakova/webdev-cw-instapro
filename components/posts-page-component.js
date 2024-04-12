@@ -1,6 +1,7 @@
 import { USER_POSTS_PAGE } from "../routes.js";
 import { renderHeaderComponent } from "./header-component.js";
-import { posts, goToPage } from "../index.js";
+import { posts, goToPage, getToken } from "../index.js";
+import { getDislike, getLike } from "../api.js";
 
 export function renderPostsPageComponent({ appEl }) {
   // TODO: реализовать рендер постов из api
@@ -23,7 +24,7 @@ export function renderPostsPageComponent({ appEl }) {
                     </div>
                     <div class="post-likes">
                       <button data-post-id=${post.id} data-liked="${post.isLiked}" class="like-button">
-                        <img src="./assets/images/like-active.svg">
+                      ${post.isLiked ? `<img src="./assets/images/like-active.svg"></img>` : `<img src="./assets/images/like-not-active.svg"></img>`}
                       </button>
                       <p class="post-likes-text">
                         Нравится: <strong>2</strong>
@@ -50,7 +51,7 @@ export function renderPostsPageComponent({ appEl }) {
     <ul class="posts">
     ${postsHtml}
     </ul>
-  </div>`;    
+  </div>`;
   appEl.innerHTML = appHtml;
 
   renderHeaderComponent({
@@ -63,5 +64,42 @@ export function renderPostsPageComponent({ appEl }) {
         userId: userEl.dataset.userId,
       });
     });
+
   }
+  function getLikePost() {
+    const likesButton = document.querySelectorAll('.like-button');
+    for (const like of likesButton) {
+      like.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const id = like.dataset.id;
+        const liked = like.dataset.liked;
+        console.log(id);
+        console.log(liked);
+        if (liked === 'false') {
+          getLike(id, { token: getToken() })
+            .then(() => {
+              like.querySelector("img").src = './assets/images/like-active.svg';
+              like.dataset.liked = "true";
+            })
+            .catch((error) => {
+              console.error("Ошибка при добавлении лайка:", error);
+            });
+        } else {
+          getDislike(id, { token: getToken() })
+            .then(() => {
+              like.querySelector("img").src = './assets/images/like-not-active.svg';
+              like.dataset.liked = "false";
+            })
+            .catch((error) => {
+              console.error("Ошибка при удалении лайка:", error);
+            });
+        }
+      });
+    }
+  }
+  getLikePost();
+
 }
+
+
+
