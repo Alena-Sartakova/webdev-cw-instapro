@@ -111,8 +111,8 @@ export const userPosts = ({ token, description, imageUrl }) => {
 }
 
 //лайки
-export const getLike = (id, { token }) => {
-  return fetch(`${postsHost}/${id}/like`, {
+export const getLike = ({ postId, token }) => {
+  return fetch(`${postsHost}/${postId}/like`, {
     method: "POST",
     headers: {
       Authorization: token,
@@ -128,10 +128,11 @@ export const getLike = (id, { token }) => {
       console.error("Ошибка при установке лайка:", error);
       throw error;
     });
+
 };
 
-export const getDislike = (id, { token }) => {
-  return fetch(`${postsHost}/${id}/dislike`, {
+export const getDislike = ({ postId, token }) => {
+  return fetch(`${postsHost}/${postId}/dislike`, {
     method: "POST",
     headers: {
       Authorization: token,

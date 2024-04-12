@@ -27,7 +27,9 @@ export function renderPostsPageComponent({ appEl }) {
                       ${post.isLiked ? `<img src="./assets/images/like-active.svg"></img>` : `<img src="./assets/images/like-not-active.svg"></img>`}
                       </button>
                       <p class="post-likes-text">
-                        Нравится: <strong>2</strong>
+                        Нравится: <strong>
+                        ${post.likes.length === 0 ? 0 : post.likes.length === 1 ? post.likes[0].name : post.likes[(post.likes.length - 1)].name + ' и еще ' + (post.likes.length - 1)}
+                        </strong>
                       </p>
                     </div>
                     <p class="post-text">
@@ -67,35 +69,44 @@ export function renderPostsPageComponent({ appEl }) {
 
   }
   function getLikePost() {
-    const likesButton = document.querySelectorAll('.like-button');
-    for (const like of likesButton) {
-      like.addEventListener("click", (event) => {
+    const likesButtons = document.querySelectorAll('.like-button');
+
+    likesButtons.forEach((button) => {
+      button.addEventListener("click", (event) => {
         event.stopPropagation();
-        const id = like.dataset.id;
-        const liked = like.dataset.liked;
+
+        const id = button.dataset.postId; // Получаем id поста 
+        const isLiked = button.dataset.liked; // Узнаем поставил ли пользователь лайк
+        const index = posts.findIndex((post) => post.id === id); // Находим индекс поста в массиве posts
         console.log(id);
-        console.log(liked);
-        if (liked === 'false') {
-          getLike(id, { token: getToken() })
+        console.log(isLiked);
+        console.log(index);
+        if (index === -1) {
+          console.error("Ошибка: пост не найден");
+          return;
+        }
+
+        if (isLiked === 'false') {
+          getLike({ id, token: getToken() })
             .then(() => {
-              like.querySelector("img").src = './assets/images/like-active.svg';
-              like.dataset.liked = "true";
+
+              goToPage(POSTS_PAGE);
             })
             .catch((error) => {
               console.error("Ошибка при добавлении лайка:", error);
             });
         } else {
-          getDislike(id, { token: getToken() })
+          getDislike({ id, token: getToken() })
             .then(() => {
-              like.querySelector("img").src = './assets/images/like-not-active.svg';
-              like.dataset.liked = "false";
+
+              goToPage(POSTS_PAGE);
             })
             .catch((error) => {
               console.error("Ошибка при удалении лайка:", error);
             });
         }
       });
-    }
+    });
   }
   getLikePost();
 
