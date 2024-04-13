@@ -42,7 +42,9 @@ function getAPI() {
         posts = newPosts;
         renderApp();
       } else {
+        goToPage(ADD_POSTS_PAGE);
         console.log("Нет постов");
+
       }
     })
     .catch((error) => {
@@ -132,13 +134,22 @@ const renderApp = () => {
           .then(() => {
             goToPage(POSTS_PAGE);
           })
+          .catch((error) => {
+            if (error.message === "Сервер упал") {
+              alert("Сервер сломался, попробуйте позже");
+              postPosts({ token: getToken(), description, imageUrl });
+            } else {
+              alert('Кажется, у вас не работает интернет, попробуйте позже');
+              console.log(error);
+            }
+          });
       },
     });
   }
 
   if (page === POSTS_PAGE) {
     return renderPostsPageComponent({
-      appEl,
+      appEl, userView: false,
     });
   }
 
@@ -146,7 +157,7 @@ const renderApp = () => {
     // TODO: реализовать страницу фотографию пользвателя
     appEl.innerHTML = "Здесь будет страница фотографий пользователя";
     return renderPostsPageComponent({
-      appEl,
+      appEl, userView: true,
     });
   }
 };

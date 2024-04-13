@@ -3,7 +3,7 @@ import { renderHeaderComponent } from "./header-component.js";
 import { posts, goToPage, getToken } from "../index.js";
 import { getDislike, getLike } from "../api.js";
 
-export function renderPostsPageComponent({ appEl }) {
+export function renderPostsPageComponent({ appEl, userView }) {
   // TODO: реализовать рендер постов из api
   console.log("Актуальный список постов:", posts);
 
@@ -75,9 +75,9 @@ export function renderPostsPageComponent({ appEl }) {
       button.addEventListener("click", (event) => {
         event.stopPropagation();
 
-        const id = button.dataset.postId; // Получаем id поста 
-        const isLiked = button.dataset.liked; // Узнаем поставил ли пользователь лайк
-        const index = posts.findIndex((post) => post.id === id); // Находим индекс поста в массиве posts
+        const id = button.dataset.postId;
+        const isLiked = button.dataset.liked; 
+        const index = posts.findIndex((post) => post.id === id); 
         console.log(id);
         console.log(isLiked);
         console.log(index);
@@ -89,8 +89,9 @@ export function renderPostsPageComponent({ appEl }) {
         if (isLiked === 'false') {
           getLike(id, { token: getToken() })
             .then((updatedPost) => {
-
-              goToPage(POSTS_PAGE);
+              const newPage = userView ? USER_POSTS_PAGE : POSTS_PAGE;
+              goToPage(newPage, { userId: posts[0].user.id });
+              // goToPage(POSTS_PAGE);
             })
             .catch((error) => {
               console.error("Ошибка при добавлении лайка:", error);
@@ -98,8 +99,8 @@ export function renderPostsPageComponent({ appEl }) {
         } else {
           getDislike(id, { token: getToken() })
             .then((updatedPost) => {
-
-              goToPage(POSTS_PAGE);
+              const newPage = userView ? USER_POSTS_PAGE : POSTS_PAGE;
+              goToPage(newPage, { userId: posts[0].user.id });
             })
             .catch((error) => {
               console.error("Ошибка при удалении лайка:", error);

@@ -1,6 +1,6 @@
 // Замени на свой, чтобы получить независимый от других набор данных.
 // "боевая" версия инстапро лежит в ключе prod
-const personalKey = "prod";
+const personalKey = "alenka-s";
 const baseHost = "https://webdev-hw-api.vercel.app";
 const postsHost = `${baseHost}/api/v1/${personalKey}/instapro`;
 
@@ -125,6 +125,7 @@ export const getLike = (id, { token }) => {
       return response.json();
     })
     .catch((error) => {
+      alert('Вы не авторизованы!')
       console.error("Ошибка при установке лайка:", error);
       throw error;
     });
