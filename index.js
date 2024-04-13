@@ -69,27 +69,14 @@ export const goToPage = (newPage, data) => {
 
     else if (newPage === POSTS_PAGE) {
       page = LOADING_PAGE;
-      renderApp();
-
       return getAPI();
-
-      // getPosts({ token: getToken() })
-      //   .then((newPosts) => {
-      //     page = POSTS_PAGE;
-      //     posts = newPosts;
-      //     renderApp();
-      //   })
-      //   .catch((error) => {
-      //     console.error(error);
-      //     goToPage(POSTS_PAGE);
-      //   });
     }
 
     else if (newPage === USER_POSTS_PAGE) {
       // TODO: реализовать получение постов юзера из API
       console.log("Открываю страницу пользователя: ", data.userId);
       page = LOADING_PAGE;
-       renderApp();
+      renderApp();
 
       return fetchPostsUser(data.userId, { token: getToken() })
         .then((newPosts) => {

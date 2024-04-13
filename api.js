@@ -111,8 +111,8 @@ export const userPosts = ({ token, description, imageUrl }) => {
 }
 
 //лайки
-export const getLike = ({ postId, token }) => {
-  return fetch(`${postsHost}/${postId}/like`, {
+export const getLike = (id, { token }) => {
+  return fetch(`${postsHost}/${id}/like`, {
     method: "POST",
     headers: {
       Authorization: token,
@@ -131,8 +131,8 @@ export const getLike = ({ postId, token }) => {
 
 };
 
-export const getDislike = ({ postId, token }) => {
-  return fetch(`${postsHost}/${postId}/dislike`, {
+export const getDislike = (id, { token }) => {
+  return fetch(`${postsHost}/${id}/dislike`, {
     method: "POST",
     headers: {
       Authorization: token,

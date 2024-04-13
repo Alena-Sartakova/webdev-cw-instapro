@@ -1,4 +1,4 @@
-import { USER_POSTS_PAGE } from "../routes.js";
+import { POSTS_PAGE, USER_POSTS_PAGE } from "../routes.js";
 import { renderHeaderComponent } from "./header-component.js";
 import { posts, goToPage, getToken } from "../index.js";
 import { getDislike, getLike } from "../api.js";
@@ -87,8 +87,8 @@ export function renderPostsPageComponent({ appEl }) {
         }
 
         if (isLiked === 'false') {
-          getLike({ id, token: getToken() })
-            .then(() => {
+          getLike(id, { token: getToken() })
+            .then((updatedPost) => {
 
               goToPage(POSTS_PAGE);
             })
@@ -96,8 +96,8 @@ export function renderPostsPageComponent({ appEl }) {
               console.error("Ошибка при добавлении лайка:", error);
             });
         } else {
-          getDislike({ id, token: getToken() })
-            .then(() => {
+          getDislike(id, { token: getToken() })
+            .then((updatedPost) => {
 
               goToPage(POSTS_PAGE);
             })
