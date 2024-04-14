@@ -16,6 +16,7 @@ export function getPosts({ token }) {
   })
     .then((response) => {
       if (response.status === 401) {
+
         throw new Error("Нет авторизации");
       }
 
@@ -128,7 +129,7 @@ export const getLike = (id, { token }) => {
       throw new Error(`Нет авторизации`);
     })
     .catch((error) => {
-      alert('Вы не авторизованы!')
+      // alert('Вы не авторизованы!')
       throw error;
     });
 

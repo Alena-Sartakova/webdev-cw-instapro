@@ -1,6 +1,6 @@
 import { POSTS_PAGE, USER_POSTS_PAGE } from "../routes.js";
 import { renderHeaderComponent } from "./header-component.js";
-import { posts, goToPage, getToken } from "../index.js";
+import { posts, goToPage, getToken, user } from "../index.js";
 import { getDislike, getLike } from "../api.js";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale"
@@ -80,15 +80,19 @@ export function renderPostsPageComponent({ appEl, userView }) {
         const id = button.dataset.postId;
         const isLiked = button.dataset.liked;
         const index = posts.findIndex((post) => post.id === id);
+        console.log(user);
         console.log(id);
         console.log(isLiked);
         console.log(index);
-        if (index === -1) {
+        if (user === null) {
+          alert("Вы не авторизованы!")
+        }
+        else if (index === -1) {
           console.error("Ошибка: пост не найден");
           return;
         }
 
-        if (isLiked === 'false') {
+        else if (isLiked === 'false') {
           getLike(id, { token: getToken() })
             .then((updatedPost) => {
               const newPage = userView ? USER_POSTS_PAGE : POSTS_PAGE;
