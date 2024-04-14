@@ -2,7 +2,7 @@ import { POSTS_PAGE, USER_POSTS_PAGE } from "../routes.js";
 import { renderHeaderComponent } from "./header-component.js";
 import { posts, goToPage, getToken } from "../index.js";
 import { getDislike, getLike } from "../api.js";
-
+import { format } from "date-fns";
 export function renderPostsPageComponent({ appEl, userView }) {
   // TODO: реализовать рендер постов из api
   console.log("Актуальный список постов:", posts);
@@ -13,6 +13,7 @@ export function renderPostsPageComponent({ appEl, userView }) {
    */
 
   let postsHtml = posts.map((post) => {
+    const createDate = format(new Date(), 'yyyy-MM-dd ');
     return `              
                   <li class="post">
                     <div class="post-header" data-user-id=${post.user.id}>
@@ -36,9 +37,9 @@ export function renderPostsPageComponent({ appEl, userView }) {
                       <span class="user-name">${post.user.name}</span>
                       ${post.description}
                     </p>
-                    <p class="post-date">
-                      19 минут назад
-                    </p>
+                    <div>
+                     ${createDate}
+                    </div>
                   </li>
                   
                 
@@ -76,8 +77,8 @@ export function renderPostsPageComponent({ appEl, userView }) {
         event.stopPropagation();
 
         const id = button.dataset.postId;
-        const isLiked = button.dataset.liked; 
-        const index = posts.findIndex((post) => post.id === id); 
+        const isLiked = button.dataset.liked;
+        const index = posts.findIndex((post) => post.id === id);
         console.log(id);
         console.log(isLiked);
         console.log(index);
