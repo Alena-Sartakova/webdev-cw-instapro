@@ -1,4 +1,7 @@
 // Замени на свой, чтобы получить независимый от других набор данных.
+
+import { sanitizeHtml } from "./helpers.js";
+
 // "боевая" версия инстапро лежит в ключе prod
 const personalKey = "alenka-s";
 const baseHost = "https://webdev-hw-api.vercel.app";
@@ -28,9 +31,9 @@ export function registerUser({ login, password, name, imageUrl }) {
   return fetch(baseHost + "/api/user", {
     method: "POST",
     body: JSON.stringify({
-      login,
-      password,
-      name,
+      login: sanitizeHtml(login),
+      password: sanitizeHtml(password),
+      name: sanitizeHtml(name),
       imageUrl,
     }),
   }).then((response) => {
@@ -91,7 +94,7 @@ export const userPosts = ({ token, description, imageUrl }) => {
   return fetch(postsHost, {
     method: "POST",
     body: JSON.stringify({
-      description,
+      description: sanitizeHtml(description),
       imageUrl,
     }),
     headers: {
@@ -119,14 +122,13 @@ export const getLike = (id, { token }) => {
     }
   })
     .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Ошибка ${response.status}: ${response.statusText}`);
+      if (response.ok) {
+        return response.json();
       }
-      return response.json();
+      throw new Error(`Нет авторизации`);
     })
     .catch((error) => {
       alert('Вы не авторизованы!')
-      console.error("Ошибка при установке лайка:", error);
       throw error;
     });
 
