@@ -1,8 +1,11 @@
-import { USER_POSTS_PAGE } from "../routes.js";
+import { POSTS_PAGE, USER_POSTS_PAGE } from "../routes.js";
 import { renderHeaderComponent } from "./header-component.js";
-import { posts, goToPage } from "../index.js";
-
-export function renderPostsPageComponent({ appEl }) {
+import { posts, goToPage, getToken, user } from "../index.js";
+import { getDislike, getLike } from "../api.js";
+import { formatDistanceToNow } from "date-fns";
+import { ru } from "date-fns/locale"
+import { sanitizeHtml } from "../helpers.js";
+export function renderPostsPageComponent({ appEl, userView }) {
   // TODO: реализовать рендер постов из api
   console.log("Актуальный список постов:", posts);
 
@@ -12,29 +15,32 @@ export function renderPostsPageComponent({ appEl }) {
    */
 
   let postsHtml = posts.map((post) => {
+
     return `              
                   <li class="post">
                     <div class="post-header" data-user-id=${post.user.id}>
                         <img src=${post.user.imageUrl} class="post-header__user-image">
-                        <p class="post-header__user-name">${post.user.name}</p>
+                        <p class="post-header__user-name">${sanitizeHtml(post.user.name)}</p>
                     </div>
                     <div class="post-image-container">
                       <img class="post-image" src=${post.imageUrl}>
                     </div>
                     <div class="post-likes">
                       <button data-post-id=${post.id} data-liked="${post.isLiked}" class="like-button">
-                        <img src="./assets/images/like-active.svg">
+                      ${post.isLiked ? `<img src="./assets/images/like-active.svg"></img>` : `<img src="./assets/images/like-not-active.svg"></img>`}
                       </button>
                       <p class="post-likes-text">
-                        Нравится: <strong>2</strong>
+                        Нравится: <strong>
+                        ${post.likes.length === 0 ? 0 : post.likes.length === 1 ? post.likes[0].name : post.likes[(post.likes.length - 1)].name + ' и еще ' + (post.likes.length - 1)}
+                        </strong>
                       </p>
                     </div>
                     <p class="post-text">
-                      <span class="user-name">${post.user.name}</span>
+                      <span class="user-name">${sanitizeHtml(post.user.name)}</span>
                       ${post.description}
                     </p>
                     <p class="post-date">
-                      19 минут назад
+                    ${formatDistanceToNow(new Date(post.createdAt), { locale: ru })} назад
                     </p>
                   </li>
                   
@@ -50,7 +56,7 @@ export function renderPostsPageComponent({ appEl }) {
     <ul class="posts">
     ${postsHtml}
     </ul>
-  </div>`;    
+  </div>`;
   appEl.innerHTML = appHtml;
 
   renderHeaderComponent({
@@ -63,5 +69,56 @@ export function renderPostsPageComponent({ appEl }) {
         userId: userEl.dataset.userId,
       });
     });
+
   }
+  function getLikePost() {
+    const likesButtons = document.querySelectorAll('.like-button');
+
+    likesButtons.forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+
+        const id = button.dataset.postId;
+        const isLiked = button.dataset.liked;
+        const index = posts.findIndex((post) => post.id === id);
+        console.log(user);
+        console.log(id);
+        console.log(isLiked);
+        console.log(index);
+        if (user === null) {
+          alert("Вы не авторизованы!")
+        }
+        else if (index === -1) {
+          console.error("Ошибка: пост не найден");
+          return;
+        }
+
+        else if (isLiked === 'false') {
+          getLike(id, { token: getToken() })
+            .then((updatedPost) => {
+              const newPage = userView ? USER_POSTS_PAGE : POSTS_PAGE;
+              goToPage(newPage, { userId: posts[0].user.id });
+              // goToPage(POSTS_PAGE);
+            })
+            .catch((error) => {
+              console.error("Ошибка при добавлении лайка:", error);
+            });
+        } else {
+          getDislike(id, { token: getToken() })
+            .then((updatedPost) => {
+              const newPage = userView ? USER_POSTS_PAGE : POSTS_PAGE;
+              goToPage(newPage, { userId: posts[0].user.id });
+            })
+            .catch((error) => {
+              console.error("Ошибка при удалении лайка:", error);
+            });
+        }
+      });
+    });
+  }
+  getLikePost();
+
 }
+
+
+

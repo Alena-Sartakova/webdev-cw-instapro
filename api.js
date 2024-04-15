@@ -1,6 +1,9 @@
 // Замени на свой, чтобы получить независимый от других набор данных.
+
+import { sanitizeHtml } from "./helpers.js";
+
 // "боевая" версия инстапро лежит в ключе prod
-const personalKey = "prod";
+const personalKey = "alenka-s";
 const baseHost = "https://webdev-hw-api.vercel.app";
 const postsHost = `${baseHost}/api/v1/${personalKey}/instapro`;
 
@@ -13,6 +16,7 @@ export function getPosts({ token }) {
   })
     .then((response) => {
       if (response.status === 401) {
+
         throw new Error("Нет авторизации");
       }
 
@@ -28,9 +32,9 @@ export function registerUser({ login, password, name, imageUrl }) {
   return fetch(baseHost + "/api/user", {
     method: "POST",
     body: JSON.stringify({
-      login,
-      password,
-      name,
+      login: sanitizeHtml(login),
+      password: sanitizeHtml(password),
+      name: sanitizeHtml(name),
       imageUrl,
     }),
   }).then((response) => {
@@ -69,7 +73,7 @@ export function uploadImage({ file }) {
   });
 }
 //посты пользователя
-export function fetchPostsUser( id , { token }) {
+export function fetchPostsUser(id, { token }) {
   return fetch(`${postsHost}/user-posts/${id}`, {
     method: "GET",
     headers: {
@@ -80,7 +84,6 @@ export function fetchPostsUser( id , { token }) {
       if (response.status === 401) {
         throw new Error("Нет авторизации");
       }
-
       return response.json();
     })
     .then((data) => {
@@ -92,12 +95,12 @@ export const userPosts = ({ token, description, imageUrl }) => {
   return fetch(postsHost, {
     method: "POST",
     body: JSON.stringify({
-      description,
+      description: sanitizeHtml(description),
       imageUrl,
     }),
     headers: {
       Authorization: token,
-  }
+    }
   })
     .then((response) => {
       if (response.status === 500) {
@@ -110,3 +113,43 @@ export const userPosts = ({ token, description, imageUrl }) => {
     })
 
 }
+
+//лайки
+export const getLike = (id, { token }) => {
+  return fetch(`${postsHost}/${id}/like`, {
+    method: "POST",
+    headers: {
+      Authorization: token,
+    }
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(`Нет авторизации`);
+    })
+    .catch((error) => {
+      // alert('Вы не авторизованы!')
+      throw error;
+    });
+
+};
+
+export const getDislike = (id, { token }) => {
+  return fetch(`${postsHost}/${id}/dislike`, {
+    method: "POST",
+    headers: {
+      Authorization: token,
+    }
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Ошибка ${response.status}: ${response.statusText}`);
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      console.error("Ошибка при удалении лайка:", error);
+      throw error;
+    });
+};
